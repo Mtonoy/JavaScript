@@ -1,0 +1,56 @@
+=========================== With Common JS ==================================
+
+        
+        function serachResult() {
+            var codeId = $('#subUnitId').val();
+            var unitId = $('#unitId').val();
+            Common.Ajax('GET', `/Supply/SupReports/MoneyCodeWiseUnitReportByUnit?unitId=${unitId}&subUnitId=${codeId}`, [], 'json', ajaxGetAllData);
+
+        }
+
+        function ajaxGetAllData(response) {
+            $('#tblData tbody').empty();
+            if (response.length == 0) {
+                $('#tblData tbody').append(`<tr><td colspan="7">No Data Found</td></tr>`);
+            }
+            else {
+                $.each(response, function (i, v) {
+                    $('#tblData tbody').append(`<tr><td>${(i + 1)}</td><td>${v.itemName}</td><td>${v.unitName}</td><td>${v.subUnitName}</td><td>${v.WorkorderNumber}</td><td>${v.qty}</td><td>${formatDate(v.date)}</td></tr>`);
+                })
+
+            }
+
+        }
+        
+        
+        ============================ Direct API Call Ajax (Without common) ==========================================
+        
+         function openModal(unitName, unitId, codeId) {
+            var yearId = $('#yearId').val();
+            $('#modalHeader').empty();
+            $('#modalHeader').append(unitName + ' Expence Details');
+            $.ajax({
+                url: "/Supply/SupReports/GetExpenceDetailsByUnitByCodeId",
+                type: 'GET',
+                data: { unitId: unitId, codeId: codeId, yearId: yearId },
+                success: function (data) {
+                    $('#modalTbl tbody').empty();
+                    $('#btnItem').empty();
+                    $('#btnTotal').empty();
+                    var sum = 0.00;
+                    var items = 0.00;
+                    $.each(data, function (i, v) {
+                        sum += v.total;
+                        items += v.qty;
+                        $('#modalTbl tbody').append(`<tr><td>${i + 1}</td><td>${v.code}</td><td>${v.item}</td><td>${v.unit}</td><td>${v.qty}</td><td>${v.amount}</td><td>${v.total}</td></tr>`);
+                    })
+                    $('#btnItem').append(items)
+                    $('#btnTotal').append(sum)
+                }
+            });
+
+
+            $('#modalBtn').modal('show')
+        }
+        
+        
